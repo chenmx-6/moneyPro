@@ -1,5 +1,6 @@
 package com.moneypro.bill_pro.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.moneypro.bill_pro.domain.Account;
 import com.moneypro.bill_pro.domain.Currency;
 import com.moneypro.bill_pro.enums.AccountTypes;
@@ -10,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Miles
@@ -24,7 +27,14 @@ public class AccountService {
 
     public Account save(Account account){
         Long currencyId = account.getCurrencyId();
-        Currency currency = currencyRepository.getById(currencyId);
+        Currency currency=null;
+        if(currencyId==null){
+            currency = currencyRepository.getByName("CNY");
+            account.setCurrencyId(currency.getId());
+        }else{
+            currency = currencyRepository.getById(currencyId);
+        }
+
         BigDecimal rate = currency.getRate().divide(new BigDecimal(100));
         account.setCnyBalance(account.getBalance().multiply(rate));
         if(account.getId() == null){
@@ -40,7 +50,7 @@ public class AccountService {
     }
 
     public BalanceVo findAllBalance(){
-        List<Account> list = accountRepository.list();
+        List<Account> list = accountRepository.list(getLambdaQueryWrapper());
         BigDecimal totalAmount=BigDecimal.ZERO;
         for (Account account : list) {
             if(AccountTypes.CREDIT_CARD.equals(account.getType())){
@@ -53,6 +63,20 @@ public class AccountService {
         balanceVo.setBalance(totalAmount);
         balanceVo.setAccounts(list);
         return balanceVo;
+    }
+
+    public LambdaQueryWrapper<Account> getLambdaQueryWrapper(){
+        LambdaQueryWrapper<Account> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.orderByDesc(Account::getCnyBalance);
+        return lambdaQueryWrapper;
+    }
+
+    public Map<String,String> getAccountTypes(){
+        Map<String,String> map = new HashMap<>();
+        for (AccountTypes value : AccountTypes.values()) {
+            map.put(value.getCode(),value.getDesc());
+        }
+        return map;
     }
 
 }

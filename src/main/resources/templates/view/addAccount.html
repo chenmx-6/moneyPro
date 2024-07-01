@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../../static/bootstrap/css/bootstrap.css"/>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" href="../../static/bootstrap/js/bootstrap.min.js"></script>
+    <meta charset="UTF-8">
+    <title>addAccount</title>
+</head>
+<body>
+<div class="container">
+    <main>
+        <div class="py-5 text-center">
+            <h2>Checkout form</h2>
+            <p class="lead">Below is an example form built entirely with Bootstrap’s form controls. Each required form
+                group has a validation state that can be triggered by attempting to submit the form without completing
+                it.</p>
+        </div>
+        <div class="row g-5">
+            <div class="col-md-7 col-lg-8">
+                <h4 class="mb-3">Add account</h4>
+                <form class="needs-validation" th:action="@{/account/save}" method="post" novalidate th:object="${account}">
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" th:field="*{name}" placeholder="" value="" required>
+                            <div class="invalid-feedback">
+                                Valid first name is required.
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <label for="balance" class="form-label">Balance</label>
+                            <input type="text" class="form-control" id="balance" name="balance" th:field="*{balance}"placeholder="" value="" required>
+                            <div class="invalid-feedback">
+                                Valid last type is required.
+                            </div>
+                        </div>
+
+                        <h4 class="mb-3">Payment</h4>
+
+                        <div class="my-3">
+                            <div th:each="accountType:${accountTypes}" class="form-check">
+                                <input th:id="${accountType.getKey()}" name="type" th:field="*{type}" type="radio" th:value="${accountType.key}" class="form-check-input" required>
+                                <label class="form-check-label" th:for="${accountType.getKey()}" th:text="${accountType.getValue()}"></label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label for="currencyId" class="form-label">Currency</label>
+                            <select  class="form-select" id="currencyId" name="currencyId" th:field="*{currencyId}"required>
+                                <option value="">Choose...</option>
+                                <option th:each="currency:${currencies}" th:text="${currency.name}" th:value="${currency.id}"></option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Please select a valid country.
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

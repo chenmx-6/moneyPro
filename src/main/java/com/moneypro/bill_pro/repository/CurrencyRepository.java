@@ -12,4 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class CurrencyRepository extends ServiceImpl<CurrencyMapper, Currency> {
 
+    public Currency getByName(String name){
+        return this.lambdaQuery().eq(Currency::getName, name).one();
+    }
 }
